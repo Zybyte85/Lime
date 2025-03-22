@@ -30,6 +30,7 @@ grammar = """
     %ignore WS
 """
 
+
 class Tree(Transformer):
     def start(self, items):
         # Combine all statements into a single Rust program
@@ -48,19 +49,19 @@ class Tree(Transformer):
 
     def _map_type_to_rust(self, c_type):
         # Helper to map C++ types to Rust types
-        return {
-            "void": "()",
-            "int": "i32",
-            "float": "f64",
-            "string": "&str"
-        }.get(c_type, "&str")  # Default to `&str` if type isn't listed
+        return {"void": "()", "int": "i32", "float": "f64", "string": "&str"}.get(
+            c_type, "&str"
+        )  # Default to `&str` if type isn't listed
 
     def PARAMS(self, items):
         # Convert parameter definitions into Rust format
-        return [f"{items[i + 1]}: {self._map_type_to_rust(items[i])}" for i in range(0, len(items), 2)]
+        return [
+            f"{items[i + 1]}: {self._map_type_to_rust(items[i])}"
+            for i in range(0, len(items), 2)
+        ]
 
     def print_stmt(self, items):
-        return f'println!({items[0]});'
+        return f"println!({items[0]});"
 
     def expression(self, items):
         return items[0]
