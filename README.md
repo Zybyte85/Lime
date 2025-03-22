@@ -1,5 +1,5 @@
 <div align=center>
-  <img src=Lime.png alt="Lime logo" height=200>
+  <img src=icons/lime.svg alt="Lime logo" height=200>
   <h1>Lime</h1>
   <a href=https://github.com/Zybyte85/Lime/#what>What?</a>
   ·
