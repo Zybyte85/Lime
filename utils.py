@@ -3,16 +3,20 @@ import subprocess
 from lark import Lark
 from langs.rust import *
 
-
 def compile(code, file_name):
     parser = Lark(grammar, start=start, parser=parser_alg, transformer=Tree())
     try:
+        parsed = parser.parse(code)
+    except Exception as e:
+        print(os.path.join(os.getcwd(), file_name + '.lm') + ':')
+        print(e)
+        exit() 
+    try:
         subprocess.run(
             ['rustc', '-', '-o', file_name],
-            input=str(parser.parse(code)),
+            input=str(parsed),
             text = True
         )
-        print("Compiled successfully!")
     except subprocess.SubprocessError as e:
         print("Compilation failed: ", e)
 
