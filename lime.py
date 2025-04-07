@@ -2,7 +2,6 @@ import argparse
 import utils
 import os
 
-
 def main():
     parser = argparse.ArgumentParser(
         description="Compiler for the Lime programming language",

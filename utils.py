@@ -52,7 +52,7 @@ def source(code, file_name):
     parser = Lark(grammar, start=start, parser=parser_alg, transformer=Tree())
     
     with open(file_name + file_type, 'w+') as f:
-        f.write(str(parser.parse(code)))
+        f.write("// Generated from Lime https://github.com/Zybyte85/Lime\n" + str(parser.parse(code)))
     print('Source code generated.')
 
 def import_file(input_file):

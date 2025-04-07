@@ -10,14 +10,19 @@ grammar = """
     // Modular statement definitions
     statement: print_stmt
              | function_def
+             | variable_def
+    
+    variable_def: TYPE NAME "=" expression
 
     print_stmt: "print" "(" expression ")"
     
     function_def: TYPE NAME "(" PARAMS? ")" "{" statement* "}"
     PARAMS: (TYPE NAME) ("," TYPE NAME)*
 
-    expression: ESCAPED_STRING | NUMBER | NAME
+    expression: ESCAPED_STRING | NUMBER | NAME | math_expr
+    math_expr: NUMBER (math_op NUMBER)+
 
+    math_op: "+" | "-" | "*" | "/"
     TYPE: "void" | "int" | "float" | "str" | "bool"
 
     // Imported tokens for common patterns
@@ -46,6 +51,9 @@ class Tree(Transformer):
         rust_return_type = self._map_type_to_rust(return_type)
         body_str = "\n    ".join(body)  # Indent inner statements
         return f"fn {name}() -> {rust_return_type} {{\n    {body_str}\n}}"
+
+    def variable_def(self, items):
+        return f"let {items[1]}: {self._map_type_to_rust(items[0])} = {items[2]}"
 
     def _map_type_to_rust(self, c_type):
         # Helper to map C++ types to Rust types
@@ -77,3 +85,6 @@ class Tree(Transformer):
 
     def NUMBER(self, item):
         return item
+    
+    def math_expr(self, items):
+        return items[0]
