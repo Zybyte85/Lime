@@ -19,7 +19,8 @@ grammar = """
     function_def: TYPE NAME "(" PARAMS? ")" "{" statement* "}"
     PARAMS: (TYPE NAME) ("," TYPE NAME)*
 
-    expression: ESCAPED_STRING | NUMBER | NAME | math_expr
+    expression: ESCAPED_STRING | non_string_expression
+    non_string_expression: NUMBER | NAME | math_expr
     math_expr: NUMBER (math_op NUMBER)+
 
     math_op: "+" | "-" | "*" | "/"
@@ -38,7 +39,7 @@ grammar = """
 
 class Tree(Transformer):
     def start(self, items):
-        # Combine all statements into a single Rust program
+        # Combine all statements into a single program
         return "\n".join(items)
 
     def statement(self, items):
@@ -53,7 +54,7 @@ class Tree(Transformer):
         return f"fn {name}() -> {rust_return_type} {{\n    {body_str}\n}}"
 
     def variable_def(self, items):
-        return f"let {items[1]}: {self._map_type_to_rust(items[0])} = {items[2]}"
+        return f"let {items[1]}: {self._map_type_to_rust(items[0])} = {items[2]};"
 
     def _map_type_to_rust(self, c_type):
         # Helper to map C++ types to Rust types
@@ -72,7 +73,16 @@ class Tree(Transformer):
         return f"println!({items[0]});"
 
     def expression(self, items):
-        return items[0]
+        word_list = items[0].replace('"', "").split()
+        vars = [word[1:-1] for word in word_list if word.startswith("{") and word.endswith("}")]
+        
+        if not vars:
+            return items[0]
+
+        return f"{items[0]}" + "".join(f", {var}={var}" for var in vars)
+    
+    def non_string_expression(self, items):
+        return '"{' + items[0] + '}"' + f", {items[0]}={items[0]}"
 
     def TYPE(self, item):
         return item
