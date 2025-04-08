@@ -30,7 +30,7 @@ def main():
     if args.build:
         utils.compile(code, file_name)
     elif args.source:
-        utils.source(code, file_name)
+        utils.compile(code, file_name, True)
     else:
         # If no specific option is said, or if --run
         utils.run(code, file_name)
