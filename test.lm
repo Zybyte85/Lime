@@ -1,4 +1,9 @@
 void main() {
         str text = "Hello world!"
         print("{text}")
+        print(add())
+}
+
+int add() {
+        return 5
 }

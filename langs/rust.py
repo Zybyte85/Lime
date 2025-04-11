@@ -14,13 +14,17 @@ grammar = """
     
     variable_def: TYPE NAME "=" expression
 
+    return_statement: "return" expression
+
     print_stmt: "print" "(" expression ")"
-    
-    function_def: TYPE NAME "(" PARAMS? ")" "{" statement* "}"
+
+    function_def: TYPE NAME "(" PARAMS? ")" "{" statement* return_statement? "}"
     PARAMS: (TYPE NAME) ("," TYPE NAME)*
 
-    expression: ESCAPED_STRING | non_string_expression
-    non_string_expression: NUMBER | NAME | math_expr
+    expression: raw_expr
+    raw_expr: NUMBER | NAME | ESCAPED_STRING | math_expr | func_call_expr
+    func_call_expr: func_call
+    func_call: NAME "(" PARAMS? ")"
     math_expr: NUMBER (math_op NUMBER)+
 
     math_op: "+" | "-" | "*" | "/"
@@ -35,7 +39,6 @@ grammar = """
     %import common.WS
     %ignore WS
 """
-
 
 class Tree(Transformer):
     def start(self, items):
@@ -52,6 +55,9 @@ class Tree(Transformer):
         rust_return_type = self._map_type_to_rust(return_type)
         body_str = "\n    ".join(body)  # Indent inner statements
         return f"fn {name}() -> {rust_return_type} {{\n    {body_str}\n}}"
+
+    def return_statement(self, items):
+        return f"return {items[0]};"
 
     def variable_def(self, items):
         return f"let {items[1]}: {self._map_type_to_rust(items[0])} = {items[2]};"
@@ -72,7 +78,11 @@ class Tree(Transformer):
     def print_stmt(self, items):
         return f"println!({items[0]});"
 
+    def raw_expr(self, items):
+        return items[0]
+
     def expression(self, items):
+        print(items[0])
         word_list = items[0].replace('"', "").split()
         vars = [word[1:-1] for word in word_list if word.startswith("{") and word.endswith("}")]
         
@@ -81,8 +91,11 @@ class Tree(Transformer):
 
         return f"{items[0]}" + "".join(f", {var}={var}" for var in vars)
     
-    def non_string_expression(self, items):
-        return '"{' + items[0] + '}"' + f", {items[0]}={items[0]}"
+    def func_call(self, items):
+        return f"{items[0]};"
+
+    def func_call_expr(self, items):
+        return '"{' + items[0] + '}"' + f", {items[0]}={items[0]}()"
 
     def TYPE(self, item):
         return item
