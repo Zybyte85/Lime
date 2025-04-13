@@ -27,10 +27,12 @@ grammar = """
     expression: sum_expr
 
     sum_expr: product_expr
-           | sum_expr ("+" | "-") product_expr
+            | sum_expr "+" product_expr -> addition
+            | sum_expr "-" product_expr -> subtraction
 
     product_expr: value
-                | product_expr ("*" | "/") value
+                | product_expr "*" value -> multiplication
+                | product_expr "/" value -> division
 
     value: NUMBER
          | NAME
@@ -109,24 +111,22 @@ class Tree(Transformer):
         return items[0]
 
     def sum_expr(self, items):
-        # Handle binary operations with + and - (return expression).
-        if len(items) == 1:
-            return items[0]
-
-        # Binary operation.
-        elif len(items) == 3:
-            return f"{items[0]} {items[1]} {items[2]}"
-
-        return items[0]  # Fallback.
+        return items[0]
 
     def product_expr(self, items):
-        if len(items) == 1:
-            return items[0]
-
-        elif len(items) == 3:
-            return f"{items[0]} {items[1]} {items[2]}"
-
         return items[0]
+
+    def addition(self, items):
+        return f"{items[0]} + {items[1]}"
+    
+    def subtraction(self, items):
+        return f"{items[0]} - {items[1]}"
+    
+    def multiplication(self, items):
+        return f"{items[0]} * {items[1]}"
+    
+    def division(self, items):
+        return f"{items[0]} / {items[1]}"
 
     def value(self, items):
         # Handle base values (numbers, variables, strings, function calls).
