@@ -18,24 +18,37 @@ grammar = """
 
     print_stmt: "print" "(" expression ")"
 
-    function_def: TYPE NAME "(" PARAMS? ")" "{" statement* return_statement? "}"
-    PARAMS: (TYPE NAME) ("," TYPE NAME)*
+    // Rules aren't allowed inside terminals. Fixed by changing from terminal (uppercase) to non-terminal rule.
+    function_def: TYPE NAME "(" parameter_list? ")" "{" statement* return_statement? "}"
+    parameter_list: parameter ("," parameter)*
+    parameter: TYPE NAME
 
-    expression: raw_expr
-    raw_expr: NUMBER | NAME | ESCAPED_STRING | math_expr | func_call_expr
-    func_call_expr: func_call
-    func_call: NAME "(" PARAMS? ")"
-    math_expr: NUMBER (math_op NUMBER)+
+    // Restructered expression rules to avoid ambiguity via precedence hierarchy.
+    expression: sum_expr
 
-    math_op: "+" | "-" | "*" | "/"
+    sum_expr: product_expr
+            | sum_expr "+" product_expr -> addition
+            | sum_expr "-" product_expr -> subtraction
+
+    product_expr: value
+                | product_expr "*" value -> multiplication
+                | product_expr "/" value -> division
+
+    value: NUMBER
+         | NAME
+         | ESCAPED_STRING
+         | func_call
+
+    // Allow for function calls with or without arguments.
+    func_call: NAME "(" argument_list? ")"
+    argument_list: expression ("," expression)*   
+
     TYPE: "void" | "int" | "float" | "str" | "bool"
 
     // Imported tokens for common patterns
     %import common.ESCAPED_STRING
     %import common.CNAME -> NAME
     %import common.SIGNED_NUMBER -> NUMBER
-
-    // Whitespace handling
     %import common.WS
     %ignore WS
 """
@@ -49,12 +62,34 @@ class Tree(Transformer):
         return items[0]
 
     def function_def(self, items):
-        # Items include: return type, function name, params, body statements
-        # TODO: Get parameters to work
-        return_type, name, *body = items
+        # item: return type, name, params, body
+        return_type = items[0]
+        name = items[1]
+        
+        # Handle parameters.
+        params = []
+        param_index = 2 # Skip till after name.
+        if len(items) > 2 and isinstance(items[2], list):
+            params = items[2]
+            param_index = 3 # Skip to body after params.
+            
+        # Get body statements by slicing the items list.
+        body = items[param_index:]
+        
+        # Map to Rust return type.
         rust_return_type = self._map_type_to_rust(return_type)
+        
+        # Build the function with parameters.
+        params_str = ", ".join(params)
         body_str = "\n    ".join(body)  # Indent inner statements
-        return f"fn {name}() -> {rust_return_type} {{\n    {body_str}\n}}"
+        
+        return f"fn {name}({params_str}) -> {rust_return_type} {{\n    {body_str}\n}}"
+
+    def parameter_list(self, items):
+        return items
+
+    def parameter(self, items):
+        return f"{items[1]}: {self._map_type_to_rust(items[0])}"
 
     def return_statement(self, items):
         return f"return {items[0]};"
@@ -68,34 +103,92 @@ class Tree(Transformer):
             c_type, "&str"
         )  # Default to `&str` if type isn't listed
 
-    def PARAMS(self, items):
-        # Convert parameter definitions into Rust format
-        return [
-            f"{items[i + 1]}: {self._map_type_to_rust(items[i])}"
-            for i in range(0, len(items), 2)
-        ]
-
     def print_stmt(self, items):
         return f"println!({items[0]});"
 
-    def raw_expr(self, items):
+    # Expression handling methods.
+    def expression(self, items):
         return items[0]
 
-    def expression(self, items):
-        print(items[0])
-        word_list = items[0].replace('"', "").split()
-        vars = [word[1:-1] for word in word_list if word.startswith("{") and word.endswith("}")]
-        
-        if not vars:
-            return items[0]
+    def sum_expr(self, items):
+        return items[0]
 
-        return f"{items[0]}" + "".join(f", {var}={var}" for var in vars)
+    def product_expr(self, items):
+        return items[0]
+
+    def addition(self, items):
+        return f"{items[0]} + {items[1]}"
     
-    def func_call(self, items):
-        return f"{items[0]};"
+    def subtraction(self, items):
+        return f"{items[0]} - {items[1]}"
+    
+    def multiplication(self, items):
+        return f"{items[0]} * {items[1]}"
+    
+    def division(self, items):
+        return f"{items[0]} / {items[1]}"
 
-    def func_call_expr(self, items):
-        return '"{' + items[0] + '}"' + f", {items[0]}={items[0]}()"
+    def value(self, items):
+        # Handle base values (numbers, variables, strings, function calls).
+        value = items[0]
+        
+        # Special handling for string interpolation.
+        if isinstance(value, str) and value.startswith('"') and "{" in value:
+            content = value.strip('"')
+            
+            # Check for mixed content (text with variables and/or function calls).
+            if "{" in content and "}" in content:
+                # Extract all interpolated parts.
+                parts = []
+                format_str = content
+
+                current_pos = 0
+                while "{" in format_str[current_pos:] and "}" in format_str[current_pos:]:
+                    # Find the next interpolation.
+                    start = format_str.find("{", current_pos)
+                    end = format_str.find("}", start)
+                    
+                    # If we found a valid interpolation.
+                    if start != -1 and end != -1:
+                        # Extract the variable or function call.
+                        var = format_str[start+1:end]
+                        
+                        # Found a function call.
+                        if "(" in var and ")" in var:
+                            format_str = format_str[:start] + "{}" + format_str[end+1:]
+                            parts.append(var)
+
+                        else:
+                            # This is a simple variable, keep as is with Rust named parameter style.
+                            pass
+                        
+                        current_pos = start + 2  # Move past this interpolation.
+                    else:
+                        break
+                
+                if parts:
+                    # We have function calls to add as parameters.
+                    return f'"{format_str}"' + "".join(f", {part}" for part in parts)
+
+                else:
+                    # Only simple variables using Rust named parameter style.
+                    return f'"{format_str}"'
+            
+            # Regular string without interpolation.
+            return f'"{content}"'
+        
+        return value
+
+    def func_call(self, items):
+        # Handle function calls with or without arguments.
+        if len(items) == 1:
+            return f"{items[0]}()"
+
+        elif len(items) == 2:
+            return f"{items[0]}({items[1]})"
+
+    def argument_list(self, items):
+        return ", ".join(items)
 
     def TYPE(self, item):
         return item

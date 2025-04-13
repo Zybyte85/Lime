@@ -1,9 +1,19 @@
 void main() {
-        str text = "Hello world!"
-        print("{text}")
-        print(add())
+    str greeting = "Hello, world!"
+    int x = 5
+    int y = 10
+
+    print("{greeting}")
+    print("{add(x, y)}")
+    print("{multiply(2, 5)}")
+    print("{add(multiply(2, 5), 5)}")
+    print("The sum of {x} and {y} is {add(x, y)}")
 }
 
-int add() {
-        return 5
+int add(int a, int b) {
+    return a + b
+}
+
+int multiply(int a, int b) {
+    return a * b
 }
