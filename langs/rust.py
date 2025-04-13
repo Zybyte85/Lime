@@ -136,11 +136,6 @@ class Tree(Transformer):
         if isinstance(value, str) and value.startswith('"') and "{" in value:
             content = value.strip('"')
             
-            # Check if this is a simple function call interpolation (only a function call).
-            if content.startswith("{") and content.endswith("}") and "(" in content and ")" in content:
-                func_expr = content[1:-1]  # Remove outer { and }.
-                return f'"{{}}", {func_expr}'
-            
             # Check for mixed content (text with variables and/or function calls).
             if "{" in content and "}" in content:
                 # Extract all interpolated parts.
