@@ -1,0 +1,47 @@
+start: statement+
+
+    // Modular statement definitions
+    statement: print_stmt
+             | function_def
+             | variable_def
+    
+    variable_def: TYPE NAME "=" expression
+
+    return_statement: "return" expression
+
+    print_stmt: "print" "(" expression ")"
+
+    // Rules aren't allowed inside terminals. Fixed by changing from terminal (uppercase) to non-terminal rule.
+    function_def: TYPE NAME "(" parameter_list? ")" "{" statement* return_statement? "}"
+    parameter_list: parameter ("," parameter)*
+    parameter: TYPE NAME
+
+    // Restructered expression rules to avoid ambiguity via precedence hierarchy.
+    expression: sum_expr
+
+    sum_expr: product_expr
+            | sum_expr "+" product_expr -> addition
+            | sum_expr "-" product_expr -> subtraction
+
+    product_expr: value
+                | product_expr "*" value -> multiplication
+                | product_expr "/" value -> division
+
+    value: NUMBER
+         | NAME
+         | ESCAPED_STRING
+         | func_call
+
+    // Allow for function calls with or without arguments.
+    func_call: NAME "(" argument_list? ")"
+    argument_list: expression ("," expression)*   
+
+    TYPE: "void" | "int" | "float" | "str" | "bool"
+
+    // Imported tokens for common patterns
+    %import common.ESCAPED_STRING
+    %import common.CNAME -> NAME
+    %import common.SIGNED_NUMBER -> NUMBER
+    %import common.WS
+    %ignore WS
+
