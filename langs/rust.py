@@ -134,13 +134,53 @@ class Tree(Transformer):
         
         # Special handling for string interpolation.
         if isinstance(value, str) and value.startswith('"') and "{" in value:
-            word_list = value.replace('"', "").split()
-            vars = [word[1:-1] for word in word_list if word.startswith("{") and word.endswith("}")]
+            content = value.strip('"')
             
-            if not vars:
-                return value
+            # Check if this is a simple function call interpolation (only a function call).
+            if content.startswith("{") and content.endswith("}") and "(" in content and ")" in content:
+                func_expr = content[1:-1]  # Remove outer { and }.
+                return f'"{{}}", {func_expr}'
+            
+            # Check for mixed content (text with variables and/or function calls).
+            if "{" in content and "}" in content:
+                # Extract all interpolated parts.
+                parts = []
+                format_str = content
 
-            return f"{value}" + "".join(f", {var}" for var in vars)
+                current_pos = 0
+                while "{" in format_str[current_pos:] and "}" in format_str[current_pos:]:
+                    # Find the next interpolation.
+                    start = format_str.find("{", current_pos)
+                    end = format_str.find("}", start)
+                    
+                    # If we found a valid interpolation.
+                    if start != -1 and end != -1:
+                        # Extract the variable or function call.
+                        var = format_str[start+1:end]
+                        
+                        # Found a function call.
+                        if "(" in var and ")" in var:
+                            format_str = format_str[:start] + "{}" + format_str[end+1:]
+                            parts.append(var)
+
+                        else:
+                            # This is a simple variable, keep as is with Rust named parameter style.
+                            pass
+                        
+                        current_pos = start + 2  # Move past this interpolation.
+                    else:
+                        break
+                
+                if parts:
+                    # We have function calls to add as parameters.
+                    return f'"{format_str}"' + "".join(f", {part}" for part in parts)
+
+                else:
+                    # Only simple variables using Rust named parameter style.
+                    return f'"{format_str}"'
+            
+            # Regular string without interpolation.
+            return f'"{content}"'
         
         return value
 
