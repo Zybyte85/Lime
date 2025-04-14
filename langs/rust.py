@@ -3,7 +3,6 @@ from lark import Transformer
 parser_alg = "lalr"
 file_type = ".rs"
 
-
 class Tree(Transformer):
     def start(self, items):
         # Combine all statements into a single program

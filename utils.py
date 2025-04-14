@@ -3,6 +3,7 @@ import subprocess
 from lark import Lark
 from lark.exceptions import UnexpectedToken, UnexpectedCharacters
 from langs.rust import *
+from timeit import default_timer as timer
 
 
 def get_bad_text(code, line, column, token):
