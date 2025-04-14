@@ -1,5 +1,5 @@
 <div align=center>
-  <img src=icons/lime.svg alt="Lime logo" height=200>
+  <img src=assets/icons/lime.svg alt="Lime logo" height=200>
   <h1>Lime</h1>
   <a href=https://github.com/Zybyte85/Lime/#what>What?</a>
   ·
@@ -12,17 +12,36 @@ Lime is a language with Python-like syntax that transpiles to Rust. It is curren
 ### Example
 ```
 void main() {
-        print("Hello World!")
+    str greeting = "Hello, world!"
+    int x = 5
+    int y = 10
+
+    print("{greeting}")
+    print("The sum of {x} and {y} is {add(x, y)}")
+}
+
+int add(int a, int b) {
+    return a + b
 }
 ```
 Would transpile into:
 ```
 fn main() -> () {
-    println!("Hello World!");
+    let greeting: &str = "Hello, world!";
+    let x: i32 = 5;
+    let y: i32 = 10;
+    println!("{greeting}");
+    println!("The sum of {x} and {y} is {}", add(x, y));
+}
+fn add(a: i32, b: i32) -> i32 {
+    return a + b;
 }
 ```
 Which would then compile into a binary and output
-`Hello World!`
+```
+Hello, world!
+The sum of 5 and 10 is 15
+```
 This is about as much as the language can do for now, because, like I said, it is in a VERY early stage.
 
 ## Why
