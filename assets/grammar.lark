@@ -4,6 +4,7 @@ start: statement+
     statement: print_stmt
              | function_def
              | variable_def
+             | conditional
     
     variable_def: TYPE NAME "=" expression
 
@@ -15,6 +16,13 @@ start: statement+
     function_def: TYPE NAME "(" parameter_list? ")" "{" statement* return_statement? "}"
     parameter_list: parameter ("," parameter)*
     parameter: TYPE NAME
+
+    conditional: if_stmt | else_stmt | elif_stmt
+    if_stmt: "if" condition "{" statement* "}"
+    else_stmt: "else" "{" statement* "}"
+    elif_stmt: "else" if_stmt
+
+    condition: value (COMPARATOR value)*
 
     // Restructered expression rules to avoid ambiguity via precedence hierarchy.
     expression: sum_expr
@@ -37,6 +45,7 @@ start: statement+
     argument_list: expression ("," expression)*   
 
     TYPE: "void" | "int" | "float" | "str" | "bool"
+    COMPARATOR: "==" | ">" | ">=" | "<" | "<=" | "&&" | "||"
 
     // Imported tokens for common patterns
     %import common.ESCAPED_STRING

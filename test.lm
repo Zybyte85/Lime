@@ -4,10 +4,15 @@ void main() {
     int y = 10
 
     print("{greeting}")
-    print("{add(x, y)}")
-    print("{multiply(2, 5)}")
-    print("{add(multiply(2, 5), 5)}")
     print("The sum of {x} and {y} is {add(x, y)}")
+
+    if multiply(3, 3) > add(3, 3) && true == true {
+        print("3*3 is greater than 3+3")
+    } else if 1==1 {
+        print("else if case")
+    } else {
+        print("else case")
+    }
 }
 
 int add(int a, int b) {

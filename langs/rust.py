@@ -78,6 +78,26 @@ class Tree(Transformer):
     def division(self, items):
         return f"{items[0]} / {items[1]}"
 
+    def conditional(self, items):
+        return items[0]
+
+    def if_stmt(self, items):
+        condition = items[0]
+        body = items[1:]
+        body_str = "\n        ".join(body)  # Indent inner statements
+        return f"if {condition} {{\n        {body_str}\n    }}"
+
+    def elif_stmt(self, items):
+        return f"else {items[0]}"
+
+    def else_stmt(self, items):
+        body = items[0:]
+        body_str = "\n        ".join(body)  # Indent inner statements
+        return f"else {{\n        {body_str}\n    }}"
+
+    def condition(self, items):
+        return " ".join(items)
+
     def value(self, items):
         # Handle base values (numbers, variables, strings, function calls).
         value = items[0]
