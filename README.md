@@ -49,3 +49,12 @@ I have always liked Python. I love how fast you can make somthing and read other
 
 ## Contributing
 If you are interested in it, and know how to, please contribute. It helps a lot and I would very much appriciate it :)
+
+## Roadmap
+- [ ] Finish basic language features
+  - [x] Functions
+  - [x] Conditional statements
+  - [ ] Switch statements
+  - [ ] Loops
+  - [ ] Dot notation
+- [ ] Add support for using Rust libraries
