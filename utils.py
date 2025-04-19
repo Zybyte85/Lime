@@ -58,7 +58,7 @@ Error:\x1b[31m Unexpcted character:\x1b[0m '{e.char}'
 
 def run(code, file_name):
     compile(code, file_name)
-    os.system(f"./{file_name}")
+    os.system(f'./"{file_name}"')
 
 
 def import_file(input_file):
