@@ -13,6 +13,10 @@ void main() {
     } else {
         print("else case")
     }
+
+    while true {
+        print("This is a forever loop")
+    }
 }
 
 int add(int a, int b) {

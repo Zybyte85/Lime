@@ -5,6 +5,7 @@ start: statement+
              | function_def
              | variable_def
              | conditional
+             | loop_stmt
     
     variable_def: TYPE NAME "=" expression
 
@@ -23,6 +24,8 @@ start: statement+
     elif_stmt: "else" if_stmt
 
     condition: value (COMPARATOR value)*
+
+    loop_stmt: "while" condition "{" statement* "}"
 
     // Restructered expression rules to avoid ambiguity via precedence hierarchy.
     expression: sum_expr

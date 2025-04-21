@@ -98,6 +98,12 @@ class Tree(Transformer):
     def condition(self, items):
         return " ".join(items)
 
+    def loop_stmt(self, items):
+        condition = items[0]
+        body = items[1:]
+        body_str = "\n        ".join(body)
+        return f"while {condition} {{\n        {body_str}\n    }}"
+
     def value(self, items):
         # Handle base values (numbers, variables, strings, function calls).
         value = items[0]
