@@ -7,6 +7,7 @@ simple_stmt: print_stmt
 compound_stmt: function_def
         | conditional
         | while_stmt
+        | loop_stmt
         | variable_def
 
 // Simple Statements
@@ -33,6 +34,7 @@ condition: value (COMPARATOR value)*
 
 // Loop types
 while_stmt: "while" condition "{" statement* "}"
+loop_stmt: "loop" "{" statement* "}"
 
 // Variable things
 variable_def: TYPE NAME "=" expression

@@ -78,6 +78,9 @@ class Tree(Transformer):
         body_str = "\n        ".join(body)
         return f"while {condition} {{\n        {body_str}\n    }}"
 
+    def loop_stmt(self, items):
+        return f"loop {{\n        {"".join(items)}\n    }}"
+
     def variable_def(self, items):
         return f"let {items[1]}: {self._map_type_to_rust(items[0])} = {items[2]};"
 

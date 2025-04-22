@@ -14,7 +14,7 @@ void main() {
         print("else case")
     }
 
-    while true {
+    loop {
         print("This is a forever loop")
     }
 }
