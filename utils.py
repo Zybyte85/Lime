@@ -2,9 +2,11 @@ import os
 import subprocess
 from lark import Lark
 from lark.exceptions import UnexpectedToken, UnexpectedCharacters
-from langs.rust import *
+from langs import rust
 from timeit import default_timer as timer
 
+transformer = rust.Tree()
+file_type = rust.file_type
 
 def get_bad_text(code, line, column, token):
     lines = code.splitlines()
@@ -25,7 +27,7 @@ def get_bad_text(code, line, column, token):
 
 def compile(code, file_name, source=False):
     grammar = open("assets/grammar.lark", "r").read()
-    parser = Lark(grammar, start="start", parser=parser_alg, transformer=Tree())
+    parser = Lark(grammar, start="start", parser="lalr", transformer=transformer)
     try:
         parsed = parser.parse(code)
     except UnexpectedToken as e:

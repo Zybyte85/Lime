@@ -1,6 +1,5 @@
 from lark import Transformer
 
-parser_alg = "lalr"
 file_type = ".rs"
 
 class Tree(Transformer):
