@@ -11,6 +11,15 @@ class Tree(Transformer):
     def statement(self, items):
         return items[0]
 
+    def simple_stmt(self, items):
+        return items[0]
+
+    def compound_stmt(self, items):
+        return items[0]
+
+    def print_stmt(self, items):
+        return f"println!({items[0]});"
+
     def function_def(self, items):
         # item: return type, name, params, body
         return_type = items[0]
@@ -44,17 +53,34 @@ class Tree(Transformer):
     def return_statement(self, items):
         return f"return {items[0]};"
 
+    def conditional(self, items):
+        return items[0]
+
+    def if_stmt(self, items):
+        condition = items[0]
+        body = items[1:]
+        body_str = "\n        ".join(body)  # Indent inner statements
+        return f"if {condition} {{\n        {body_str}\n    }}"
+
+    def elif_stmt(self, items):
+        return f"else {items[0]}"
+
+    def else_stmt(self, items):
+        body = items[0:]
+        body_str = "\n        ".join(body)  # Indent inner statements
+        return f"else {{\n        {body_str}\n    }}"
+
+    def condition(self, items):
+        return " ".join(items)
+
+    def while_stmt(self, items):
+        condition = items[0]
+        body = items[1:]
+        body_str = "\n        ".join(body)
+        return f"while {condition} {{\n        {body_str}\n    }}"
+
     def variable_def(self, items):
         return f"let {items[1]}: {self._map_type_to_rust(items[0])} = {items[2]};"
-
-    def _map_type_to_rust(self, c_type):
-        # Helper to map C++ types to Rust types
-        return {"void": "()", "int": "i32", "float": "f64", "string": "&str"}.get(
-            c_type, "&str"
-        )  # Default to `&str` if type isn't listed
-
-    def print_stmt(self, items):
-        return f"println!({items[0]});"
 
     # Expression handling methods.
     def expression(self, items):
@@ -77,32 +103,6 @@ class Tree(Transformer):
 
     def division(self, items):
         return f"{items[0]} / {items[1]}"
-
-    def conditional(self, items):
-        return items[0]
-
-    def if_stmt(self, items):
-        condition = items[0]
-        body = items[1:]
-        body_str = "\n        ".join(body)  # Indent inner statements
-        return f"if {condition} {{\n        {body_str}\n    }}"
-
-    def elif_stmt(self, items):
-        return f"else {items[0]}"
-
-    def else_stmt(self, items):
-        body = items[0:]
-        body_str = "\n        ".join(body)  # Indent inner statements
-        return f"else {{\n        {body_str}\n    }}"
-
-    def condition(self, items):
-        return " ".join(items)
-
-    def loop_stmt(self, items):
-        condition = items[0]
-        body = items[1:]
-        body_str = "\n        ".join(body)
-        return f"while {condition} {{\n        {body_str}\n    }}"
 
     def value(self, items):
         # Handle base values (numbers, variables, strings, function calls).
@@ -184,3 +184,9 @@ class Tree(Transformer):
 
     def math_expr(self, items):
         return items[0]
+
+    def _map_type_to_rust(self, c_type):
+        # Helper to map C++ types to Rust types
+        return {"void": "()", "int": "i32", "float": "f64", "string": "&str"}.get(
+            c_type, "&str"
+        )  # Default to `&str` if type isn't listed

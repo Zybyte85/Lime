@@ -1,59 +1,69 @@
 start: statement+
 
-    // Modular statement definitions
-    statement: print_stmt
-             | function_def
-             | variable_def
-             | conditional
-             | loop_stmt
-    
-    variable_def: TYPE NAME "=" expression
+statement: compound_stmt | simple_stmt
 
-    return_statement: "return" expression
+simple_stmt: print_stmt
 
-    print_stmt: "print" "(" expression ")"
+compound_stmt: function_def
+        | conditional
+        | while_stmt
+        | variable_def
 
-    // Rules aren't allowed inside terminals. Fixed by changing from terminal (uppercase) to non-terminal rule.
-    function_def: TYPE NAME "(" parameter_list? ")" "{" statement* return_statement? "}"
-    parameter_list: parameter ("," parameter)*
-    parameter: TYPE NAME
+// Simple Statements
+// =================
 
-    conditional: if_stmt | else_stmt | elif_stmt
-    if_stmt: "if" condition "{" statement* "}"
-    else_stmt: "else" "{" statement* "}"
-    elif_stmt: "else" if_stmt
+print_stmt: "print" "(" expression ")"
 
-    condition: value (COMPARATOR value)*
+// Compound Statements
+// ===================
 
-    loop_stmt: "while" condition "{" statement* "}"
+// Functions
+function_def: TYPE NAME "(" parameter_list? ")" "{" statement* return_statement? "}"
+parameter_list: parameter ("," parameter)*
+parameter: TYPE NAME
+return_statement: "return" expression
 
-    // Restructered expression rules to avoid ambiguity via precedence hierarchy.
-    expression: sum_expr
+// Conditionals
+conditional: if_stmt | else_stmt | elif_stmt
+if_stmt: "if" condition "{" statement* "}"
+elif_stmt: "else" if_stmt
+else_stmt: "else" "{" statement* "}"
 
-    sum_expr: product_expr
-            | sum_expr "+" product_expr -> addition
-            | sum_expr "-" product_expr -> subtraction
+condition: value (COMPARATOR value)*
 
-    product_expr: value
-                | product_expr "*" value -> multiplication
-                | product_expr "/" value -> division
+// Loop types
+while_stmt: "while" condition "{" statement* "}"
 
-    value: NUMBER
-         | NAME
-         | ESCAPED_STRING
-         | func_call
+// Variable things
+variable_def: TYPE NAME "=" expression
 
-    // Allow for function calls with or without arguments.
-    func_call: NAME "(" argument_list? ")"
-    argument_list: expression ("," expression)*   
+// Other definitions
+expression: sum_expr
 
-    TYPE: "void" | "int" | "float" | "str" | "bool"
-    COMPARATOR: "==" | ">" | ">=" | "<" | "<=" | "&&" | "||"
+sum_expr: product_expr
+        | sum_expr "+" product_expr -> addition
+        | sum_expr "-" product_expr -> subtraction
 
-    // Imported tokens for common patterns
-    %import common.ESCAPED_STRING
-    %import common.CNAME -> NAME
-    %import common.SIGNED_NUMBER -> NUMBER
-    %import common.WS
-    %ignore WS
+product_expr: value
+        | product_expr "*" value -> multiplication
+        | product_expr "/" value -> division
+
+value: NUMBER
+        | NAME
+        | ESCAPED_STRING
+        | func_call
+
+// Allow for function calls with or without arguments.
+func_call: NAME "(" argument_list? ")"
+argument_list: expression ("," expression)*   
+
+TYPE: "void" | "int" | "float" | "str" | "bool"
+COMPARATOR: "==" | ">" | ">=" | "<" | "<=" | "&&" | "||"
+
+// Imported tokens for common patterns
+%import common.ESCAPED_STRING
+%import common.CNAME -> NAME
+%import common.SIGNED_NUMBER -> NUMBER
+%import common.WS
+%ignore WS
 
