@@ -19,6 +19,9 @@ class Tree(Transformer):
     def print_stmt(self, items):
         return f"println!({items[0]});"
 
+    def assignment(self, items):
+        return f"{items[0]} = {"".join(items[1:])}"
+
     def function_def(self, items):
         # item: return type, name, params, body
         return_type = items[0]
@@ -82,7 +85,22 @@ class Tree(Transformer):
         return f"loop {{\n        {"".join(items)}\n    }}"
 
     def variable_def(self, items):
+        return items[0]
+
+    def normal_var(self, items):
+        return f"let mut {items[0]} = {items[1]};"
+
+    def let_var(self, items):
+        return f"let {items[0]} = {items[1]};"
+
+    def normal_var_type(self, items):
+        return f"let mut {items[1]}: {self._map_type_to_rust(items[0])} = {items[2]};"
+
+    def let_var_type(self, items):
         return f"let {items[1]}: {self._map_type_to_rust(items[0])} = {items[2]};"
+
+    def const_var(self, items):
+        return f"const {items[1]}: {self._map_type_to_rust(items[0])} = {items[2]};"
 
     # Expression handling methods.
     def expression(self, items):

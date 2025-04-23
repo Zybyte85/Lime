@@ -1,9 +1,10 @@
-void main() {
-    str greeting = "Hello, world!"
-    int x = 5
-    int y = 10
+const str GREETING = "Hello, world!"
 
-    print("{greeting}")
+void main() {
+    let x = 5
+    let y = 10
+
+    print("{GREETING}")
     print("The sum of {x} and {y} is {add(x, y)}")
 
     if multiply(3, 3) > add(3, 3) && true == true {
@@ -14,8 +15,10 @@ void main() {
         print("else case")
     }
 
-    loop {
-        print("This is a forever loop")
+    var int i = 0
+    while i < 10{
+        print("{i}")
+        i = i + 1
     }
 }
 
