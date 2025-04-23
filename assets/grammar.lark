@@ -80,3 +80,7 @@ NAME: /(?!(void|int|float|str|bool)\b)[a-zA-Z_][a-zA-Z0-9_]*/
 %import common.SIGNED_NUMBER -> NUMBER
 %import common.WS
 %ignore WS
+
+// Ignore comments
+COMMENT: "#" /[^\n]*/  // Matches everything except newline
+%ignore COMMENT

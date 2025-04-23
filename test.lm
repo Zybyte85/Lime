@@ -1,7 +1,7 @@
 const str GREETING = "Hello, world!"
 
 void main() {
-    let x = 5
+    let x = 5 # Inferred type
     let y = 10
 
     print("{GREETING}")
@@ -16,7 +16,7 @@ void main() {
     }
 
     var int i = 0
-    while i < 10{
+    while i < 10 {
         print("{i}")
         i = i + 1
     }
