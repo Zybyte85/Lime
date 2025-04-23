@@ -11,36 +11,73 @@ Lime is a language with Python-like syntax that transpiles to Rust. It is curren
 
 ### Example
 ```
-void main() {
-    str greeting = "Hello, world!"
-    int x = 5
-    int y = 10
+const str GREETING = "Hello, world!"
 
-    print("{greeting}")
+void main() {
+    let x = 5 # Inferred type
+    let y = 10
+
+    print("{GREETING}")
     print("The sum of {x} and {y} is {add(x, y)}")
+
+    if multiply(3, 3) > add(3, 3) {
+        print("3*3 is greater than 3+3")
+
+    var int i = 0
+    while i < 10 {
+        print("{i}")
+        i = i + 1
+    }
 }
 
 int add(int a, int b) {
     return a + b
 }
+
+int multiply(int a, int b) {
+    return a * b
+}
 ```
 Would transpile into:
 ```
+const GREETING: &str = "Hello, world!";
 fn main() -> () {
-    let greeting: &str = "Hello, world!";
-    let x: i32 = 5;
-    let y: i32 = 10;
-    println!("{greeting}");
+    let x = 5;
+    let y = 10;
+    println!("{GREETING}");
     println!("The sum of {x} and {y} is {}", add(x, y));
+    if multiply(3, 3) > add(3, 3) {
+        println!("3*3 is greater than 3+3");
+    }
+    let mut i: i32 = 0;
+    while i <= 10 {
+        println!("{i}");
+        i = i + 1
+    }
 }
 fn add(a: i32, b: i32) -> i32 {
     return a + b;
+}
+fn multiply(a: i32, b: i32) -> i32 {
+    return a * b;
 }
 ```
 Which would then compile into a binary and output
 ```
 Hello, world!
 The sum of 5 and 10 is 15
+3*3 is greater than 3+3
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
 ```
 This is about as much as the language can do for now, because, like I said, it is in a VERY early stage.
 
