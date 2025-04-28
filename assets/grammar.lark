@@ -24,7 +24,7 @@ assignment: NAME "=" expression
 // Functions
 function_def: TYPE NAME "(" parameter_list? ")" "{" statement* return_statement? "}"
 parameter_list: parameter ("," parameter)*
-parameter: TYPE NAME
+parameter: NAME ":" TYPE
 return_statement: "return" expression
 
 // Conditionals
@@ -45,9 +45,9 @@ variable_def: normal_var | let_var | normal_var_type | let_var_type | const_var
 normal_var: "var" NAME "=" expression
 let_var: "let" NAME "=" expression
 
-normal_var_type: "var" TYPE NAME "=" expression
-let_var_type: "let" TYPE NAME "=" expression
-const_var: "const" TYPE NAME "=" expression
+normal_var_type: "var" NAME ":" TYPE "=" expression
+let_var_type: "let" NAME ":" TYPE "=" expression
+const_var: "const" NAME ":" TYPE "=" expression
 
 // Other definitions
 expression: sum_expr

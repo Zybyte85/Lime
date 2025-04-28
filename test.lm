@@ -1,4 +1,4 @@
-const str GREETING = "Hello, world!"
+const GREETING: str = "Hello, world!"
 
 void main() {
     let x = 5 # Inferred type
@@ -15,17 +15,17 @@ void main() {
         print("else case")
     }
 
-    var int i = 0
+    var i: int = 0
     while i < 10 {
         print("{i}")
         i = i + 1
     }
 }
 
-int add(int a, int b) {
+int add(a: int, b: int) {
     return a + b
 }
 
-int multiply(int a, int b) {
+int multiply(a: int, b: int) {
     return a * b
 }
