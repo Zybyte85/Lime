@@ -16,11 +16,23 @@ class Tree(Transformer):
     def compound_stmt(self, items):
         return items[0]
 
-    def print_stmt(self, items):
-        return f"println!({items[0]});"
-
     def assignment(self, items):
         return f"{items[0]} = {"".join(items[1:])}"
+
+    def std_macros(self, items):
+        return items[0]
+
+    def env_macro(self, items):
+        return f"env!({items[0]});"
+
+    def file_macro(self, items):
+        return f"file!({items[0]});"
+
+    def println_macro(self, items):
+        return f"println!({items[0]});"
+
+    def vec_macro(self, items):
+        return f"vec!({items[0]});"
 
     def function_def(self, items):
         # item: return type, name, params, body

@@ -2,8 +2,8 @@ start: statement+
 
 statement: compound_stmt | simple_stmt
 
-simple_stmt: print_stmt
-        | assignment
+simple_stmt: assignment
+        | std_macros
 
 compound_stmt: function_def
         | conditional
@@ -14,9 +14,20 @@ compound_stmt: function_def
 // Simple Statements
 // =================
 
-print_stmt: "print" "(" expression ")"
-
 assignment: NAME "=" expression
+
+// Macros
+
+std_macros: env_macro
+        | file_macro
+        | println_macro
+        | vec_macro
+
+// Not all of them yet. If possible, I would like to find a way to automatically detect macros, but that may not be possible.
+env_macro: "env" "(" expression ")"
+file_macro: "file" "(" expression ")"
+println_macro: "println" "(" expression ")"
+vec_macro: "vec" "(" expression ")"
 
 // Compound Statements
 // ===================
