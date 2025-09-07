@@ -1,31 +1,22 @@
 const GREETING: str = "Hello, world!"
 
 void main() {
-    let x = 5 # Inferred type
+    let x = 5
     let y = 10
-
+    
     println("{GREETING}")
     println("The sum of {x} and {y} is {add(x, y)}")
-
-    if multiply(3, 3) > add(3, 3) && true == true {
-        println("3*3 is greater than 3+3")
-    } else if 1==1 {
-        println("else if case")
-    } else {
-        println("else case")
-    }
-
+    
     var i: int = 0
     while i < 10 {
         println("{i}")
         i = i + 1
     }
+
+    i = 900
+    println("i is now {i}")
 }
 
 int add(a: int, b: int) {
     return a + b
-}
-
-int multiply(a: int, b: int) {
-    return a * b
 }

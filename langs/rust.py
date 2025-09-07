@@ -17,7 +17,7 @@ class Tree(Transformer):
         return items[0]
 
     def assignment(self, items):
-        return f"{items[0]} = {"".join(items[1:])}"
+        return f"{items[0]} = {items[1]};"
 
     def std_macros(self, items):
         return items[0]
