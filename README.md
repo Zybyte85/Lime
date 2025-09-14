@@ -92,6 +92,6 @@ If you are interested in it, and know how to, please contribute. It helps a lot 
   - [x] Functions
   - [x] Conditional statements
   - [ ] Switch statements
-  - [ ] Loops
+  - [ ] For loops
   - [ ] Dot notation
 - [ ] Add support for using Rust libraries
